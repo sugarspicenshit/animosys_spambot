@@ -12,8 +12,10 @@ from time import sleep
 from datetime import datetime
 from msvcrt import kbhit
 import console
-from getpass import getpass
 import traceback
+import tkinter
+from tkinter import filedialog
+import os
 
 
 ## Script Settings #############################################################
@@ -66,24 +68,51 @@ sleep_timer = 0
 
 ## SCRIPT EXECUTION STARTS HERE ################################################
 
+try:
+    import getch
+    def getpass(prompt):
+        """Replacement for getpass.getpass() which prints asterisks for each character typed"""
+        print(prompt, end='', flush=True)
+        buf = ''
+        while True:
+            ch = getch.getch()
+            if ch == '\n':
+                print('')
+                break
+            else:
+                buf += ch
+                print('*', end='', flush=True)
+        return buf
+except ImportError:
+    from getpass import getpass
+
 line = '\n'+'='*75+'\n'
 
 console.log('Animosys Enlistment Clickbot now booting up...')
 console.log('Written by: SugarSpiceNShit')
 
 if get_chromedriver_location_enabled:
-    print(line)
-    print('Enter the file location of the chromedriver executable:')
-    print(r'Example: C:\Users\myUser\chromedriver_folder')
-    print()
-    chromedriver_location = input('>> ') + r'\chromedriver.exe'
-    print(line)
+    try:
+        print(line)
+        print('Select the chromedriver executable.')
+        print(line)
+        root = tkinter.Tk()
+        root.withdraw()
+        chromedriver_location = filedialog.askopenfilename(title='Select chromedriver executable',
+            initialdir=os.getcwd())
+    except:
+        traceback.print_exc()
+        while not kbhit():
+            pass
 
 console.log('Now opening chromedriver executable located at ' + chromedriver_location)
 
 if chromedriver_location:
     try:
-        driver = webdriver.Chrome(chromedriver_location)
+        options = webdriver.ChromeOptions()
+        options.add_experimental_option('excludeSwitches', ['enable-logging'])
+        driver = webdriver.Chrome(options=options, executable_path=chromedriver_location)
+        driver.minimize_window()
     except:
         console.error('Cannot open chromedriver! Now printing traceback.')
         print()
@@ -111,10 +140,11 @@ else:
 
 while True:
     if get_credentials_enabled:
+        print(line)
         print('Enter your username and password: ')
-
         username = input('Username: ')
         password = getpass('Password: ')
+        print(line)
 
     username_input = '//*[@id="userid"]'
     driver.find_element_by_xpath(username_input).click()
@@ -127,13 +157,18 @@ while True:
     login_button = '/html/body/table/tbody/tr[2]/td/table/tbody/tr[1]/td/table/tbody/tr/td/table/tbody/tr[1]/td[1]/table[2]/tbody/tr[4]/td[3]/input'
     driver.find_element_by_xpath(login_button).click()
 
-    if username_input:
-        console.error('Login failed! Re-enter credentials.\n')
+    sleep(5)
 
-        if not get_credentials_enabled:
-            exit()
-    else:
+    try:
+        driver.find_element_by_xpath(username_input).click()
+    except:
         break
+    else:
+        console.error('Login failed! Re-enter credentials.\n')
+        if not get_credentials_enabled:
+            console.error('Requesting user for credentials is disabled. Now exiting the program.')
+            while not kbhit(): pass
+            exit()
 
 console.success('Login successful!')
 
