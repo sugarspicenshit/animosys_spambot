@@ -12,3 +12,10 @@ Get these before using the script:
 2. chromedriver.exe (for your current version of Chrome)
 3. A MyLasalle account
 4. A cart filled with subjects on your Animosys
+
+## How to use
+After getting the prerequisite items, do these to run the bot:
+
+1. Download all the files
+2. Run animosys.py
+3. Browse the file
