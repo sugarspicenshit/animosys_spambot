@@ -8,10 +8,11 @@
 ################################################################################
 
 from selenium import webdriver
+from selenium.webdriver.common.by import By
 from time import sleep
 from datetime import datetime
 from msvcrt import kbhit
-import console
+from console import console
 import traceback
 import tkinter
 from tkinter import filedialog
@@ -20,7 +21,7 @@ import os
 
 ## Script Settings #############################################################
 ##
-## Variables that modify the script's behavior.
+# Variables that modify the script's behavior.
 ##
 ################################################################################
 
@@ -70,6 +71,7 @@ sleep_timer = 0
 
 try:
     import getch
+
     def getpass(prompt):
         """Replacement for getpass.getpass() which prints asterisks for each character typed"""
         print(prompt, end='', flush=True)
@@ -99,19 +101,21 @@ if get_chromedriver_location_enabled:
         root = tkinter.Tk()
         root.withdraw()
         chromedriver_location = filedialog.askopenfilename(title='Select chromedriver executable',
-            initialdir=os.getcwd())
+                                                           initialdir=os.getcwd())
     except:
         traceback.print_exc()
         while not kbhit():
             pass
 
-console.log('Now opening chromedriver executable located at ' + chromedriver_location)
+console.log('Now opening chromedriver executable located at ' +
+            chromedriver_location)
 
 if chromedriver_location:
     try:
         options = webdriver.ChromeOptions()
         options.add_experimental_option('excludeSwitches', ['enable-logging'])
-        driver = webdriver.Chrome(options=options, executable_path=chromedriver_location)
+        driver = webdriver.Chrome(
+            options=options, executable_path=chromedriver_location)
         driver.minimize_window()
     except:
         console.error('Cannot open chromedriver! Now printing traceback.')
@@ -131,8 +135,8 @@ if chromedriver_location:
 try:
     driver.get('https://animo.sys.dlsu.edu.ph/psp/ps/?cmd=login')
 except:
-    console.error('Cannot open animo.sys.dlsu.edu.ph! Possible causes are website might be down; ' + 
-        'errors in your internet connection; or address has been changed.')
+    console.error('Cannot open animo.sys.dlsu.edu.ph! Possible causes are website might be down; ' +
+                  'errors in your internet connection; or address has been changed.')
     exit()
 else:
     console.success('Website has been successfully opened!')
@@ -147,27 +151,29 @@ while True:
         print(line)
 
     username_input = '//*[@id="userid"]'
-    driver.find_element_by_xpath(username_input).click()
-    driver.find_element_by_xpath(username_input).send_keys(username)
+    driver.find_element(by=By.XPATH, value=username_input).click()
+    driver.find_element(by=By.XPATH, value=username_input).send_keys(username)
 
     password_input = '//*[@id="pwd"]'
-    driver.find_element_by_xpath(password_input).click()
-    driver.find_element_by_xpath(password_input).send_keys(password)
+    driver.find_element(by=By.XPATH, value=password_input).click()
+    driver.find_element(by=By.XPATH, value=password_input).send_keys(password)
 
     login_button = '/html/body/table/tbody/tr[2]/td/table/tbody/tr[1]/td/table/tbody/tr/td/table/tbody/tr[1]/td[1]/table[2]/tbody/tr[4]/td[3]/input'
-    driver.find_element_by_xpath(login_button).click()
+    driver.find_element(by=By.XPATH, value=login_button).click()
 
     sleep(5)
 
     try:
-        driver.find_element_by_xpath(username_input).click()
+        driver.find_element(by=By.XPATH, value=username_input).click()
     except:
         break
     else:
         console.error('Login failed! Re-enter credentials.\n')
         if not get_credentials_enabled:
-            console.error('Requesting user for credentials is disabled. Now exiting the program.')
-            while not kbhit(): pass
+            console.error(
+                'Requesting user for credentials is disabled. Now exiting the program.')
+            while not kbhit():
+                pass
             exit()
 
 console.success('Login successful!')
@@ -179,11 +185,13 @@ if get_subjects_enabled:
     while True:
         code = input("Subject Code: ")
 
-        if int(input)==0: break
+        if int(input) == 0:
+            break
 
 console.log('Now attempting to force enlistment!')
 current_time = str(datetime.now().hour) + ':' + str(datetime.now().minute)
-console.log('Current time is ' + datetime.strptime(current_time, "%H:%M").strftime('%I:%M %p'))
+console.log('Current time is ' +
+            datetime.strptime(current_time, "%H:%M").strftime('%I:%M %p'))
 
 # xpath of all buttons clicked in this process
 confirm_button = r'//*[@id="DERIVED_REGFRM1_LINK_ADD_ENRL$114$"]'
@@ -202,31 +210,37 @@ while True:
         # Fixes the bug where the 'Proceed to Step 2 of 3' button could not be found.
         driver.get('https://animo.sys.dlsu.edu.ph/psc/ps/EMPLOYEE/HRMS/c/SA_LEARNER_SERVICES.SSR_SSENRL_CART.GBL?Page=SSR_SSENRL_CART&Action=A&ACAD_CAREER=UGB&EMPLID=11846712&ENRL_REQUEST_ID=&INSTITUTION=DLSU&STRM=1203')
 
-        if kbhit(): break
+        if kbhit():
+            break
 
-        console.log(f'Attempting to click button: \'Proceed to Step 2 of 3\'! [{count}]')
+        console.log(
+            f'Attempting to click button: \'Proceed to Step 2 of 3\'! [{count}]')
 
-        driver.find_element_by_xpath(confirm_button).click()
+        driver.find_element(by=By.XPATH, value=confirm_button).click()
 
-        console.success(f'Clicking button: \'Proceed to Step 2 of 3\', successful! [{count}]')
+        console.success(
+            f'Clicking button: \'Proceed to Step 2 of 3\', successful! [{count}]')
 
-        console.log(f'Attempting to click button: \'Finish Enrolling\'! [{count}]')
+        console.log(
+            f'Attempting to click button: \'Finish Enrolling\'! [{count}]')
 
         # Fixes bug where webdriver can't find 'Finish Enrolling' button.
         driver.refresh()
 
-        driver.find_element_by_xpath(finish_button).click()
+        driver.find_element(by=By.XPATH, value=finish_button).click()
 
-        console.success(f'Clicking button: \'Finish Enrolling\', successful! [{count}]')
+        console.success(
+            f'Clicking button: \'Finish Enrolling\', successful! [{count}]')
 
-        console.success(f'Attempt {count} at forcing enlistment is successful!')
+        console.success(
+            f'Attempt {count} at forcing enlistment is successful!')
 
         count += 1
-            
+
     except:
         console.warning(f'Failed to click button! Trying again...')
 
-        
+
 console.log('Script execution successful!\n')
 
 driver.quit()
