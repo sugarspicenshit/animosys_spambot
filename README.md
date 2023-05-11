@@ -18,4 +18,3 @@ After getting the prerequisite items, do these to run the bot:
 
 1. Download all the files
 2. Run animosys.py
-3. Browse the file
