@@ -1,11 +1,4 @@
-## animosys.py v1.1 ############################################################
-##                                                                             #
-## This script is a spam click bot that spams the animo.sys server with        #
-## enrollment confirmation requests.                                           #
-##                                                                             #
-## Author: SugarSpiceNShit                                                     #
-##                                                                             #
-################################################################################
+# animosys.py
 
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -17,142 +10,128 @@ import traceback
 import tkinter
 from tkinter import filedialog
 import os
+import configparser
 
 
-## Script Settings #############################################################
-##
-# Variables that modify the script's behavior.
-##
-################################################################################
+# Functions ################################################################################################################
 
-# Skips the process of setting up the script.
-# RECOMMENDED: False
-# Do not disable unless you know what you're doing.
-quick_run_enabled = False
+# Chromedriver executable location prompt
+def get_chromedriver_location():
+    print('Select the chromedriver executable.')
 
-# Prompts the user for the file location of the chromdriver executable.
-# RECOMMENDED: True
-# Do not disable unless chromedriver_location is not empty.
-get_chromedriver_location_enabled = True and not quick_run_enabled
+    # Opens the File Selection window.
+    root = tkinter.Tk()
+    root.withdraw()
+    chromedriver_location = filedialog.askopenfilename(title='Select chromedriver executable',
+                                                       initialdir=os.getcwd())
 
-# File location of the chromedriver.
-# If this string is filled with a valid file location of the
-# chromedriver executable, then get_chromedriver_location_enabled
-# can be set to False.
-chromedriver_location = ""
+    return chromedriver_location
 
-# Prompts the user for their MyLasalle credentials.
-# RECOMMENDED: True
-# Do not disable unless username and password are filled with
-# valid credentials.
-get_credentials_enabled = True and not quick_run_enabled
-
-# MyLasalle credentials.
-# It is recommended that these are left empty for
-# security reasons.
-# If filled with valid credentials, then get_credentials_enabled
-# can be set to False.
-username = ""
-password = ""
-
-# Asks the user for which subjects to enroll.
-# Can be disabled if the user already has subjects in
-# the cart.
-# WARNING: This feature is a WIP and currently does nothing.
-get_subjects_enabled = False and not quick_run_enabled
-
-# Delay in between spam requests (in seconds).
-sleep_timer = 0
-
-################################################################################
+# MLS account username and password prompt
 
 
-## SCRIPT EXECUTION STARTS HERE ################################################
+def get_credentials():
+    # Hides the password as the user types it.
+    try:
+        import getch
 
-try:
-    import getch
+        def getpass(prompt):
+            """Replacement for getpass.getpass() which prints asterisks for each character typed"""
+            print(prompt, end='', flush=True)
+            buf = ''
+            while True:
+                ch = getch.getch()
+                if ch == '\n':
+                    print('')
+                    break
+                else:
+                    buf += ch
+                    print('*', end='', flush=True)
+            return buf
+    except ImportError:
+        from getpass import getpass
 
-    def getpass(prompt):
-        """Replacement for getpass.getpass() which prints asterisks for each character typed"""
-        print(prompt, end='', flush=True)
-        buf = ''
-        while True:
-            ch = getch.getch()
-            if ch == '\n':
-                print('')
-                break
-            else:
-                buf += ch
-                print('*', end='', flush=True)
-        return buf
-except ImportError:
-    from getpass import getpass
+    print('Enter your username and password: ')
+    username = input('Username: ')
+    password = getpass('Password: ')
 
-line = '\n'+'='*75+'\n'
+    return username, password
+
+
+# Script settings ##########################################################################################################
+
+config = configparser.ConfigParser()
+config.read('settings.ini')
+
+account = configparser.ConfigParser()
+account.read('account.ini')
+
+quick_run_enabled = True if config['Main']['QuickRunEnabled'] == "True" else False
+chromedriver_location = config['Main']['ChromedriverLocation'] + \
+    r'\chromedriver.exe'
+sleep_timer = config['Main']['SleepTimer']
+
+username = account['Account']['Username']
+password = account['Account']['Password']
+
+get_credentials_enabled = not (username and password)
+
+
+# Script execution starts here #############################################################################################
 
 console.log('Animosys Enlistment Clickbot now booting up...')
 console.log('Written by: SugarSpiceNShit')
 
-if get_chromedriver_location_enabled:
-    try:
-        print(line)
-        print('Select the chromedriver executable.')
-        print(line)
-        root = tkinter.Tk()
-        root.withdraw()
-        chromedriver_location = filedialog.askopenfilename(title='Select chromedriver executable',
-                                                           initialdir=os.getcwd())
-    except:
-        traceback.print_exc()
-        while not kbhit():
-            pass
+# Get chromedriver location
+if not chromedriver_location:
+    chromedriver_location = get_chromedriver_location()
 
-console.log('Now opening chromedriver executable located at ' +
-            chromedriver_location)
-
-if chromedriver_location:
-    try:
-        options = webdriver.ChromeOptions()
-        options.add_experimental_option('excludeSwitches', ['enable-logging'])
-        driver = webdriver.Chrome(
-            options=options, executable_path=chromedriver_location)
-        driver.minimize_window()
-    except:
-        console.error('Cannot open chromedriver! Now printing traceback.')
-        print()
-        traceback.print_exc()
-        print('Possible fixes:')
-        print('1. Make sure your chromedriver is compatible with your current browser\'s version.')
-        print('2. Make sure the full directory of your chromedriver executable is correct.')
-        print('\nPress any key to continue...')
-        while not kbhit():
-            pass
-        exit()
-    else:
-        console.success('Chrome successfully opened!')
-        console.log('Now opening animo.sys.dlsu.edu.ph.')
+# Initialize chromedriver
+console.log(f'Opening chromedriver at {chromedriver_location}')
 
 try:
-    driver.get('https://animo.sys.dlsu.edu.ph/psp/ps/?cmd=login')
+    options = webdriver.ChromeOptions()
+    options.add_experimental_option('excludeSwitches', ['enable-logging'])
+    driver = webdriver.Chrome(
+        options=options, executable_path=chromedriver_location)
+    driver.minimize_window()
 except:
-    console.error('Cannot open animo.sys.dlsu.edu.ph! Possible causes are website might be down; ' +
-                  'errors in your internet connection; or address has been changed.')
+    console.error('Cannot open chromedriver! Now printing traceback.')
+    print()
+    traceback.print_exc()
+    print('Possible fixes:')
+    print('1. Make sure your chromedriver is compatible with your current browser\'s version.')
+    print('2. Make sure the full directory of your chromedriver executable is correct.')
+    print('\nPress any key to continue...')
+    while not kbhit():
+        pass
     exit()
-else:
-    console.success('Website has been successfully opened!')
-    console.log('Now logging in.')
+
+# Open animosys website
+console.success('Chrome successfully opened!')
+console.log('Now opening animo.sys.dlsu.edu.ph.')
+
+driver.get('https://animo.sys.dlsu.edu.ph/psp/ps/?cmd=login')
+
+# Log in to animosys
+console.success('Website has been successfully opened!')
+console.log('Now logging in.')
 
 while True:
-    if get_credentials_enabled:
-        print(line)
-        print('Enter your username and password: ')
-        username = input('Username: ')
-        password = getpass('Password: ')
-        print(line)
+    if not get_credentials_enabled:
+        username, password = get_credentials()
 
-    username_input = '//*[@id="userid"]'
-    driver.find_element(by=By.XPATH, value=username_input).click()
-    driver.find_element(by=By.XPATH, value=username_input).send_keys(username)
+    # Circumvents the virtual queue
+    while True:
+        try:
+            username_input = '//*[@id="userid"]'
+            driver.find_element(by=By.XPATH, value=username_input).click()
+            driver.find_element(
+                by=By.XPATH, value=username_input).send_keys(username)
+        except:
+            pass
+        else:
+            break
 
     password_input = '//*[@id="pwd"]'
     driver.find_element(by=By.XPATH, value=password_input).click()
@@ -178,22 +157,12 @@ while True:
 
 console.success('Login successful!')
 
-if get_subjects_enabled:
-    print('\nEnter all the subject codes.')
-    print('\nEnter 0 once done.\n')
-
-    while True:
-        code = input("Subject Code: ")
-
-        if int(input) == 0:
-            break
-
+# Start spamming requests
 console.log('Now attempting to force enlistment!')
 current_time = str(datetime.now().hour) + ':' + str(datetime.now().minute)
 console.log('Current time is ' +
             datetime.strptime(current_time, "%H:%M").strftime('%I:%M %p'))
 
-# xpath of all buttons clicked in this process
 confirm_button = r'//*[@id="DERIVED_REGFRM1_LINK_ADD_ENRL$114$"]'
 finish_button = r'//*[@id="DERIVED_REGFRM1_SSR_PB_SUBMIT"]'
 add_another_class_button = r'//*[@id="DERIVED_REGFRM1_SSR_LINK_STARTOVER"]'
@@ -201,9 +170,7 @@ add_another_class_button = r'//*[@id="DERIVED_REGFRM1_SSR_LINK_STARTOVER"]'
 count = 0
 
 while True:
-
     try:
-
         sleep(sleep_timer)
 
         # Opens the 'Add Classes' webpage.
@@ -240,7 +207,7 @@ while True:
     except:
         console.warning(f'Failed to click button! Trying again...')
 
-
+# Script execution ends here ###############################################################################################
 console.log('Script execution successful!\n')
 
 driver.quit()
