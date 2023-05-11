@@ -1,5 +1,5 @@
 # animosys_spambot
-a bot that snatches slots from puny human mouse clicks for you
+A bot that snatches slots from cavemen who still use the website with mouse and keyboard.
 
 This bot is a WIP.
 
@@ -18,4 +18,3 @@ After getting the prerequisite items, do these to run the bot:
 
 1. Download all the files
 2. Run animosys.py
-3. Browse the file
