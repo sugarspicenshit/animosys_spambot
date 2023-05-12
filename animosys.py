@@ -1,6 +1,9 @@
 # animosys.py
 
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.wait import WebDriverWait
 from selenium import webdriver
+from selenium.common.exceptions import *
 from selenium.webdriver.common.by import By
 from time import sleep
 from datetime import datetime
@@ -15,8 +18,8 @@ import configparser
 
 # Functions ################################################################################################################
 
-# Chromedriver executable location prompt
 def get_chromedriver_location():
+    """Chromedriver executable location prompt"""
     print('Select the chromedriver executable.')
 
     # Opens the File Selection window.
@@ -27,12 +30,13 @@ def get_chromedriver_location():
 
     return chromedriver_location
 
-# MLS account username and password prompt
-
 
 def get_credentials():
+    """MLS account username and password prompt"""
     # Hides the password as the user types it.
     try:
+        # If the password field is blank during user prompt, then getch couldn't be imported.
+        # As a result, the getpass module being used as a fallback.
         import getch
 
         def getpass(prompt):
@@ -69,12 +73,17 @@ account.read('account.ini')
 quick_run_enabled = True if config['Main']['QuickRunEnabled'] == "True" else False
 chromedriver_location = config['Main']['ChromedriverLocation'] + \
     r'\chromedriver.exe'
-sleep_timer = config['Main']['SleepTimer']
+try:
+    sleep_timer = int(config['Main']['SleepTimer'])
+except:
+    sleep_timer = 0
+
+subjects = config['Main']['Subjects']
 
 username = account['Account']['Username']
 password = account['Account']['Password']
 
-get_credentials_enabled = not (username and password)
+get_credentials_enabled = username and password
 
 
 # Script execution starts here #############################################################################################
@@ -82,8 +91,10 @@ get_credentials_enabled = not (username and password)
 console.log('Animosys Enlistment Clickbot now booting up...')
 console.log('Written by: SugarSpiceNShit')
 
+console.log(f'Subjects is None: {len(subjects)}')
+
 # Get chromedriver location
-if not chromedriver_location:
+if not chromedriver_location and not quick_run_enabled:
     chromedriver_location = get_chromedriver_location()
 
 # Initialize chromedriver
@@ -118,7 +129,7 @@ console.success('Website has been successfully opened!')
 console.log('Now logging in.')
 
 while True:
-    if not get_credentials_enabled:
+    if not get_credentials_enabled and not quick_run_enabled:
         username, password = get_credentials()
 
     # Circumvents the virtual queue
@@ -156,6 +167,35 @@ while True:
             exit()
 
 console.success('Login successful!')
+
+
+# Fill cart with subjects (if Subjects is not empty and has valid inputs)
+# Feature doesn't work properly.
+# Remove False to enable this feature.
+if len(subjects) > 0 and not quick_run_enabled and False:
+    class_number_field = r'//*[@id="DERIVED_REGFRM1_CLASS_NBR"]'
+    class_number_enter_btn = r'//*[@id="DERIVED_REGFRM1_SSR_PB_ADDTOLIST2$70$"]'
+    next_btn = r'//*[@id="DERIVED_CLS_DTL_NEXT_PB$76$"]'
+
+    subjects = subjects.split()
+
+    for subject in subjects:
+        driver.get('https://animo.sys.dlsu.edu.ph/psc/ps/EMPLOYEE/HRMS/c/SA_LEARNER_SERVICES.SSR_SSENRL_CART.GBL?Page=SSR_SSENRL_CART&Action=A&ACAD_CAREER=UGB&EMPLID=11846712&ENRL_REQUEST_ID=&INSTITUTION=DLSU&STRM=1203')
+
+        try:
+            console.log(f'Now adding subject {subject} to cart.')
+
+            driver.find_element(by=By.XPATH, value=class_number_field).click()
+            driver.find_element(
+                by=By.XPATH, value=class_number_field).send_keys(subject)
+            driver.find_element(
+                by=By.XPATH, value=class_number_enter_btn).click()
+
+            driver.find_element(by=By.XPATH, value=next_btn)
+        except NoSuchElementException:
+            console.log(
+                f'Can\'t add subject {subject} to cart! Skipping to next subject')
+
 
 # Start spamming requests
 console.log('Now attempting to force enlistment!')
