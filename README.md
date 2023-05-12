@@ -62,8 +62,8 @@ A list of subject codes you want the bot to add to your cart.
 Each subject code is separated with a __space__.  
 
 📝 *Example*  
-&nbsp;Enlist for classes with subject codes: 8495, 283, 691, 4870   
-&nbsp;Change this line in the file: `Subjects = 8495 283 691 4870`
+Enlist for classes with subject codes: 8495, 283, 691, 4870   
+Change this line in the file: `Subjects = 8495 283 691 4870`
 
 >💡 By adding subjects, the [4th prerequisite](#-prerequisites) can be ignored.
 
