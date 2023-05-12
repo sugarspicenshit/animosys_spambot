@@ -46,7 +46,7 @@ Before the spambot starts spamming the enlistment process, the bot will first do
 2. Ask for your MLS username and password
 3. Add the subjects in the `Subjects` key to your cart
 
-> ✅ To skip these processes, `QuickRunEnabled` must be set to `True`
+> ✅ To skip these, `QuickRunEnabled` must be set to `True`
 
 ### ChromedriverLocation
 
