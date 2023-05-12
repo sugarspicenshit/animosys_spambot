@@ -22,7 +22,7 @@ After getting the prerequisite items, do these to run the bot:
 1. Download all the files
 2. Run animosys.py
 
-### 🔐 Set your MLS Account credentials
+## 🔐 Set your MLS Account credentials
 
 Under default settings, the program will ask for your MLS username and password. This can be skipped by modifying the 
 `account.ini` file.  
@@ -33,13 +33,13 @@ In the `account.ini` file, fill up the `username` and `password` keys with your 
 
 > 💡 **NOTE** If `QuickRunEnabled` is set to `False`, the program will still ask for your MLS username and password. To prevent this, change the value to `True`.
 
-### ⚙️ Modify the spambot's settings
+## ⚙️ Modify the spambot's settings
 
 The spambot's settings can be changed by modifying the `settings.ini` file. Below are the following settings.
 
 > ⚠️ **WARNING** Do NOT modify unless you know what you're doing.
 
-#### QuickRunEnabled
+### QuickRunEnabled
 
 Before the spambot starts spamming the enlistment process, the bot will first do the following:
 1. Prompt you to select the `chromedriver.exe` location
@@ -48,15 +48,15 @@ Before the spambot starts spamming the enlistment process, the bot will first do
 
 > ✅ To skip these processes, `QuickRunEnabled` must be set to `True`
 
-#### ChromedriverLocation
+### ChromedriverLocation
 
 The location of the folder where your `chromedriver.exe` is stored.
 
 > 💡 **NOTE** If `QuickRunEnabled` is set to `False`, the program will still prompt for the Chromedriver location. To prevent this, change the value to `True`.
 
-#### Subjects
+### Subjects
 
-> 🚧 This feature is still a **WIP**
+🚧 This feature is still a **WIP**
 
 A list of subject codes you want the bot to add to your cart.  
 Each subject code is separated with a __space__.  
@@ -69,6 +69,6 @@ Each subject code is separated with a __space__.
 
 > 💡 **NOTE** If `QuickRunEnabled` is set to `False`, the program will not add the subjects to your cart and skip straight to spamming enlistment requests. To prevent this, change the value to `True`.
 
-#### SleepTimer
+### SleepTimer
 
 A delay (in seconds) interval in between each request during the enlistment process.
