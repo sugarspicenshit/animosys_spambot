@@ -29,7 +29,9 @@ Under default settings, the program will ask for your MLS username and password.
 
 In the `account.ini` file, fill up the `username` and `password` keys with your MLS username and password.
 
-> ⚠️ **WARNING** For security reasons, it is not recommended to do this. Your MLS username and password will be rendered vulnerable.
+> ⚠️ **WARNING** For security reasons, it is not recommended to do this. Your MLS username and password will be rendered vulnerable.  
+
+> 💡 **NOTE** If `QuickRunEnabled` is set to `False`, the program will still ask for your MLS username and password. To prevent this, change the value to `True`.
 
 ### ⚙️ Modify the spambot's settings
 
@@ -50,7 +52,11 @@ Before the spambot starts spamming the enlistment process, the bot will first do
 
 The location of the folder where your `chromedriver.exe` is stored.
 
+> 💡 **NOTE** If `QuickRunEnabled` is set to `False`, the program will still prompt for the Chromedriver location. To prevent this, change the value to `True`.
+
 #### Subjects
+
+> 🚧 This feature is still a **WIP**
 
 A list of subject codes you want the bot to add to your cart.  
 Each subject code is separated with a __space__.  
@@ -60,6 +66,8 @@ Each subject code is separated with a __space__.
 > 📝 *Example*  
 > Enlist for classes with subject codes: 8495, 283, 691, 4870   
 > Change this line in the file: `Subjects = 8495 283 691 4870`
+
+> 💡 **NOTE** If `QuickRunEnabled` is set to `False`, the program will not add the subjects to your cart and skip straight to spamming enlistment requests. To prevent this, change the value to `True`.
 
 #### SleepTimer
 
