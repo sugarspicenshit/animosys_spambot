@@ -61,7 +61,7 @@ The location of the folder where your `chromedriver.exe` is stored.
 A list of subject codes you want the bot to add to your cart.  
 Each subject code is separated with a __space__.  
 
->💡 By adding subjects, the [4th prerequisite](#📋-prerequisites) can be ignored.
+>💡 By adding subjects, the [4th prerequisite](#-prerequisites) can be ignored.
 
 > 📝 *Example*  
 > Enlist for classes with subject codes: 8495, 283, 691, 4870   
