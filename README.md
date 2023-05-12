@@ -61,11 +61,11 @@ The location of the folder where your `chromedriver.exe` is stored.
 A list of subject codes you want the bot to add to your cart.  
 Each subject code is separated with a __space__.  
 
->💡 By adding subjects, the [4th prerequisite](#-prerequisites) can be ignored.
+📝 *Example*  
+&nbsp;Enlist for classes with subject codes: 8495, 283, 691, 4870   
+&nbsp;Change this line in the file: `Subjects = 8495 283 691 4870`
 
-> 📝 *Example*  
-> Enlist for classes with subject codes: 8495, 283, 691, 4870   
-> Change this line in the file: `Subjects = 8495 283 691 4870`
+>💡 By adding subjects, the [4th prerequisite](#-prerequisites) can be ignored.
 
 > ❗️ **IMPORTANT** If [`QuickRunEnabled`](#quickrunenabled) is set to `False`, the program will not add the subjects to your cart and skip straight to spamming enlistment requests. To prevent this, change the value to `True`
 
