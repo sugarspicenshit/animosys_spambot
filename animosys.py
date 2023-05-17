@@ -71,8 +71,7 @@ account = configparser.ConfigParser()
 account.read('account.ini')
 
 quick_run_enabled = True if config['Main']['QuickRunEnabled'] == "True" else False
-chromedriver_location = config['Main']['ChromedriverLocation'] + \
-    r'\chromedriver.exe'
+chromedriver_location = config['Main']['ChromedriverLocation']
 try:
     sleep_timer = int(config['Main']['SleepTimer'])
 except:
@@ -96,6 +95,8 @@ console.log(f'Subjects is None: {len(subjects)}')
 # Get chromedriver location
 if not chromedriver_location and not quick_run_enabled:
     chromedriver_location = get_chromedriver_location()
+else:
+    chromedriver_location = chromedriver_location + r'\chromedriver.exe'
 
 # Initialize chromedriver
 console.log(f'Opening chromedriver at {chromedriver_location}')
@@ -172,15 +173,16 @@ console.success('Login successful!')
 # Fill cart with subjects (if Subjects is not empty and has valid inputs)
 # Feature doesn't work properly.
 # Remove False to enable this feature.
-if len(subjects) > 0 and not quick_run_enabled and False:
+if len(subjects) > 0 and not quick_run_enabled or False:
     class_number_field = r'//*[@id="DERIVED_REGFRM1_CLASS_NBR"]'
     class_number_enter_btn = r'//*[@id="DERIVED_REGFRM1_SSR_PB_ADDTOLIST2$70$"]'
-    next_btn = r'//*[@id="DERIVED_CLS_DTL_NEXT_PB$76$"]'
+    next_btn = r'/html/body/form/div[1]/table/tbody/tr/td/div/table/tbody/tr[10]/td[2]/div/table/tbody/tr/td/table/tbody/tr[2]/td[3]/div/span/a'
 
     subjects = subjects.split()
 
     for subject in subjects:
-        driver.get('https://animo.sys.dlsu.edu.ph/psc/ps/EMPLOYEE/HRMS/c/SA_LEARNER_SERVICES.SSR_SSENRL_CART.GBL?Page=SSR_SSENRL_CART&Action=A&ACAD_CAREER=UGB&EMPLID=11846712&ENRL_REQUEST_ID=&INSTITUTION=DLSU&STRM=1203')
+        driver.get(
+            'https://animo.sys.dlsu.edu.ph/psc/ps/EMPLOYEE/HRMS/c/SA_LEARNER_SERVICES.SSR_SSENRL_CART.GBL')
 
         try:
             console.log(f'Now adding subject {subject} to cart.')
