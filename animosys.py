@@ -1,5 +1,3 @@
-# animosys.py
-
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium import webdriver
@@ -9,89 +7,34 @@ from time import sleep
 from datetime import datetime
 from msvcrt import kbhit
 from console import console
+from utils import *
 import traceback
-import tkinter
-from tkinter import filedialog
-import os
 import configparser
 
 
-def get_chromedriver_location():
-    """Chromedriver executable location prompt"""
-    print('Select the chromedriver executable.')
-
-    # Opens the File Selection window.
-    root = tkinter.Tk()
-    root.withdraw()
-    chromedriver_location = filedialog.askopenfilename(title='Select chromedriver executable',
-                                                       initialdir=os.getcwd())
-
-    return chromedriver_location
-
-
-def get_credentials():
-    """MLS account username and password prompt"""
-    # Hides the password as the user types it.
-    try:
-        # If the password field is blank during user prompt, then getch couldn't be imported.
-        # As a result, the getpass module being used as a fallback.
-        import getch
-
-        def getpass(prompt):
-            """Replacement for getpass.getpass() which prints asterisks for each character typed"""
-            print(prompt, end='', flush=True)
-            buf = ''
-            while True:
-                ch = getch.getch()
-                if ch == '\n':
-                    print('')
-                    break
-                else:
-                    buf += ch
-                    print('*', end='', flush=True)
-            return buf
-    except ImportError:
-        from getpass import getpass
-
-    print('Enter your username and password: ')
-    username = input('Username: ')
-    password = getpass('Password: ')
-
-    return username, password
-
+# Start the script execution
+console.log('Animosys Enlistment Clickbot now booting up...')
+console.log('Written by: SugarSpiceNShit')
 
 # Read the 'settings.ini' file
+console.log('Reading settings.ini')
 config = configparser.ConfigParser()
 config.read('settings.ini')
 
 # Read the 'account.ini' file
+console.log('Reading account.ini')
 account = configparser.ConfigParser()
 account.read('account.ini')
 
-# Parse the config file values to Python variables
-quick_run_enabled = True if config['Main']['QuickRunEnabled'] == "True" else False
-save_chromedriver_location = True if config['Advanced']['SaveChromedriverLocation'] == "True" else False
-is_queue_present = True if config['Advanced']['IsQueuePresent'] == "True" else False
-
-try:
-    sleep_timer = float(config['Main']['SleepTimer'])
-except:
-    sleep_timer = 0
-
 get_credentials_enabled = account['Account']['Username'] and account['Account']['Password']
 
-
-# Script execution starts here
-console.log('Animosys Enlistment Clickbot now booting up...')
-console.log('Written by: SugarSpiceNShit')
-
 # Prompt the user for the Chromedriver executable, if if it is not given in 'settings.ini'
-# and 'quick_run_enabled' is disabled.
-if not config['Main']['ChromedriverLocation'] and not quick_run_enabled:
+# and 'QuickRunEnabled' is disabled.
+if not config['Main']['ChromedriverLocation'] and not config['Main'].getboolean('QuickRunEnabled'):
     chromedriver_location = get_chromedriver_location()
 
     # Save the Chromedriver location in 'settings.ini' if SaveChromedriverLocation is enabled.
-    if save_chromedriver_location:
+    if config['Advanced'].getboolean('SaveChromedriverLocation'):
         config['Main']['ChromedriverLocation'] = chromedriver_location
 
         with open('settings.ini', 'w') as configfile:
@@ -131,7 +74,7 @@ console.log('Now logging in.')
 
 # Log in to the Animo.sys website
 while True:
-    if not get_credentials_enabled or not quick_run_enabled:
+    if not get_credentials_enabled or not config['Main'].getboolean('QuickRunEnabled'):
         username, password = get_credentials()
 
     # Circumvents the virtual queue
@@ -176,7 +119,7 @@ password = None
 
 # Fill cart with subjects (if Subjects is not empty and has valid inputs)
 # WARNING: Feature isn't currently working. Remove False to enable this feature.
-if len(config['Main']['Subjects']) > 0 and not quick_run_enabled or False:
+if len(config['Main']['Subjects']) > 0 and not config['Main'].getboolean('QuickRunEnabled') and False:
     class_number_field = r'//*[@id="DERIVED_REGFRM1_CLASS_NBR"]'
     class_number_enter_btn = r'//*[@id="DERIVED_REGFRM1_SSR_PB_ADDTOLIST2$70$"]'
     next_btn = r'/html/body/form/div[1]/table/tbody/tr/td/div/table/tbody/tr[10]/td[2]/div/table/tbody/tr/td/table/tbody/tr[2]/td[3]/div/span/a'
@@ -206,46 +149,43 @@ current_time = str(datetime.now().hour) + ':' + str(datetime.now().minute)
 console.log('Current time is ' +
             datetime.strptime(current_time, "%H:%M").strftime('%I:%M %p'))
 
-confirm_button = r'//*[@id="DERIVED_REGFRM1_LINK_ADD_ENRL$114$"]'
-finish_button = r'//*[@id="DERIVED_REGFRM1_SSR_PB_SUBMIT"]'
-add_another_class_button = r'//*[@id="DERIVED_REGFRM1_SSR_LINK_STARTOVER"]'
+# Elements by ID
+confirm_button_id = r'DERIVED_REGFRM1_LINK_ADD_ENRL$114$'
+finish_button_id = r'DERIVED_REGFRM1_SSR_PB_SUBMIT'
+add_another_class_button_id = r'DERIVED_REGFRM1_SSR_LINK_STARTOVER'
 
 count = 0
-
-# Opens the 'Add Classes' webpage.
-# Fixes the bug where the 'Proceed to Step 2 of 3' button could not be found.
-driver.get('https://animo.sys.dlsu.edu.ph/psc/ps/EMPLOYEE/HRMS/c/SA_LEARNER_SERVICES.SSR_SSENRL_CART.GBL?Page=SSR_SSENRL_CART&Action=A&ACAD_CAREER=UGB&EMPLID=11846712&ENRL_REQUEST_ID=&INSTITUTION=DLSU&STRM=1203')
 
 # Start spam clicking the buttons
 try:
     while True:
         try:
+            # Opens the 'Add Classes' webpage.
+            # Fixes the bug where the 'Proceed to Step 2 of 3' button could not be found.
+            driver.get('https://animo.sys.dlsu.edu.ph/psc/ps/EMPLOYEE/HRMS/c/SA_LEARNER_SERVICES.SSR_SSENRL_CART.GBL?Page=SSR_SSENRL_CART&Action=A&ACAD_CAREER=UGB&EMPLID=11846712&ENRL_REQUEST_ID=&INSTITUTION=DLSU&STRM=1203')
+
             console.log(
                 f'Attempting to click button: \'Proceed to Step 2 of 3\'! [{count}]')
 
-            while True:
-                try:
-                    confirm_button = driver.find_element(
-                        by=By.XPATH, value=confirm_button)
-                except:
-                    pass
-                else:
-                    break
+            # confirm_button = driver.find_element(
+            #     by=By.XPATH, value=confirm_button).click()
 
-            confirm_button.click()
+            confirm_button = driver.find_element(
+                by=By.ID, value=confirm_button_id)
 
             console.success(
                 f'Clicking button: \'Proceed to Step 2 of 3\', successful! [{count}]')
-            
-            sleep(sleep_timer)
+
+            sleep(float(config['Main']['SleepTimer']))
 
             console.log(
                 f'Attempting to click button: \'Finish Enrolling\'! [{count}]')
 
             # Fixes bug where webdriver can't find 'Finish Enrolling' button.
-            driver.refresh()
+            driver.get('https://animo.sys.dlsu.edu.ph/psc/ps/EMPLOYEE/HRMS/c/SA_LEARNER_SERVICES.SSR_SSENRL_ADD.GBL?Page=SSR_SSENRL_ADD_C&Action=U&ACAD_CAREER=UGB&EMPLID=11846712&ENRL_REQUEST_ID=0006325679&INSTITUTION=DLSU&STRM=1231&TargetFrameName=None')
 
-            driver.find_element(by=By.XPATH, value=finish_button).click()
+            # driver.find_element(by=By.XPATH, value=finish_button).click()
+            driver.find_element(by=By.ID, value=finish_button_id).click()
 
             console.success(
                 f'Clicking button: \'Finish Enrolling\', successful! [{count}]')
