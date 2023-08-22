@@ -1,3 +1,7 @@
 .vscode/settings.json
 __pycache__/console.cpython-310.pyc
 account.ini
+chromedriver-win64.zip
+chromedriver-win64/chromedriver-win64/chromedriver.exe
+chromedriver-win64/chromedriver-win64/LICENSE.chromedriver
+.gitignore
